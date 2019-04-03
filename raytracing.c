@@ -66,26 +66,22 @@ static int rayRectangularIntersection(const point3 ray_e,
     if (det < 1e-4)
         return 0;
 
-    double inv_det = 1.0 / det;
-
     point3 s;
     subtract_vector(ray_e, rec->vertices[0], s);
 
-    double alpha = inv_det * dot_product(s, p);
+    double alpha = dot_product(s, p);
 
-    if ((alpha > 1.0) || (alpha < 0.0))
+    if ((alpha > det) || (alpha < 0.0))
         return 0;
 
     point3 q;
     cross_product(s, e01, q);
 
-    double beta = inv_det * dot_product(ray_d, q);
-    if ((beta > 1.0) || (beta < 0.0))
+    double beta = dot_product(ray_d, q);
+    if ((beta > det) || (beta < 0.0))
         return 0;
 
-    *t1 = inv_det * dot_product(e03, q);
-
-    if (alpha + beta > 1.0f) {
+    if (alpha + beta > det) {
         /* for the second triangle */
         point3 e23, e21;
         subtract_vector(rec->vertices[3], rec->vertices[2], e23);
@@ -98,25 +94,28 @@ static int rayRectangularIntersection(const point3 ray_e,
         if (det < 1e-4)
             return 0;
 
-        inv_det = 1.0 / det;
         subtract_vector(ray_e, rec->vertices[2], s);
 
-        alpha = inv_det * dot_product(s, p);
+        alpha = dot_product(s, p);
         if (alpha < 0.0)
             return 0;
 
         cross_product(s, e23, q);
-        beta = inv_det * dot_product(ray_d, q);
+        beta = dot_product(ray_d, q);
 
-        if ((beta < 0.0) || (beta + alpha > 1.0))
+        if ((beta < 0.0) || (beta + alpha > det))
             return 0;
 
-        *t1 = inv_det * dot_product(e21, q);
+        *t1 = dot_product(e21, q);
+    }else{
+        *t1 = dot_product(e03, q);
     }
 
-    if (*t1 < 1e-4)
+    if (*t1 < 1e-4*det)
         return 0;
 
+    *t1 /= det;
+    
     COPY_POINT3(ip->normal, rec->normal);
     if (dot_product(ip->normal, ray_d)>0.0)
         multiply_vector(ip->normal, -1, ip->normal);
