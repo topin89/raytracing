@@ -4,7 +4,7 @@ all: $(EXEC)
 
 CC ?= gcc
 CFLAGS = \
-	-std=gnu99 -Wall -O0 -g
+	-std=gnu99 -Wall -Ofast -march=native -mtune=native -g2
 LDFLAGS = \
 	-lm
 
