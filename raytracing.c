@@ -153,6 +153,30 @@ static void localColor(color local_color,
     add_vector(local_color, diff, local_color);
 }
 
+inline double fastPrecisePow(double a, double b) {
+  // calculate approximation with fraction of the exponent
+  int e = (int) b;
+  union {
+    double d;
+    int x[2];
+  } u = { a };
+  u.x[1] = (int)((b - e) * (u.x[1] - 1072632447) + 1072632447);
+  u.x[0] = 0;
+
+  // exponentiation by squaring with the exponent's integer part
+  // double r = u.d makes everything much slower, not sure why
+  double r = 1.0;
+  while (e) {
+    if (e & 1) {
+      r *= a;
+    }
+    a *= a;
+    e >>= 1;
+  }
+
+  return r * u.d;
+}
+
 /* @param d direction of the ray into intersection
  * @param l direction of intersection to light
  * @param n surface normal
@@ -185,7 +209,7 @@ static void compute_specular_diffuse(double *diffuse,
     *diffuse = MAX(0, dot_product(n, l_copy));
 
     /* specular = (dot_product(r, -d))^p */
-    *specular = pow(MAX(0, dot_product(r, d_copy)), phong_pow);
+    *specular = fastPrecisePow(MAX(0, dot_product(r, d_copy)), phong_pow);
 }
 
 /* @param r direction of reflected ray
