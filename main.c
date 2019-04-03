@@ -8,8 +8,8 @@
 
 #define OUT_FILENAME "out.ppm"
 
-#define ROWS 512
-#define COLS 512
+#define ROWS 2160
+#define COLS 2160
 
 static void write_to_ppm(FILE *outfile, uint8_t *pixels,
                          int width, int height)
