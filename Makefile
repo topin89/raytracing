@@ -4,7 +4,7 @@ all: $(EXEC)
 
 CC ?= gcc
 CFLAGS = \
-	-std=gnu99 -Wall -Ofast -march=native -mtune=native -g2
+	-std=gnu99 -Wall -Ofast -march=native -mtune=native -g2 -fopenmp
 LDFLAGS = \
 	-lm
 
@@ -24,7 +24,7 @@ OBJS := \
 
 
 $(EXEC): $(OBJS)
-	$(CC) -o $@ $^ $(LDFLAGS)
+	$(CC) $(CFLAGS) -o $@ $^ $(LDFLAGS)
 
 main.o: use-models.h
 use-models.h: models.inc Makefile
